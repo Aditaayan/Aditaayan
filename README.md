@@ -1,73 +1,79 @@
-# Exp-14-Implement-Hash-Function
+# Exp-13-Implement-Message-Authentication-Code
 ## AIM:
-To generate a simple hash of a given message using a custom hash function.
+To generate and verify a Message Authentication Code (MAC) for ensuring the integrity and authenticity of a message using a simple XOR operation.
 
 ## DESIGN STEPS:
-Step 1: Input a message from the user.
+Step 1: Input a secret key and a message from the user.
 
-Step 2: Use a basic custom hash function that applies simple operations like XOR and addition on the characters of the message.
+Step 2: Generate the MAC by applying a simple XOR operation between the secret key and the message.
 
-Step 3: Convert the resulting hash into a hexadecimal format.
+Step 3: The MAC is computed by repeating the key or message as necessary.
 
-Step 4: Display the computed hash to the user.
+Step 4: The user can input a received MAC, and the program verifies whether the received MAC matches the computed MAC.
 
-Step 5: Optionally verify the hash by recomputing it and comparing it with a received hash.
+Step 5: The authenticity of the message is confirmed if the MACs match.
 
 ## PROGRAM:
 ```
 #include <stdio.h>
 #include <string.h>
 
-// Function to compute a simple hash using XOR and addition
-void computeSimpleHash(const char *message, unsigned char *hash) {
-    unsigned char temp = 0;
+#define MAC_SIZE 32 // Define MAC size in bytes
 
-    // Simple hash computation: XOR and addition
-    for (int i = 0; message[i] != '\0'; i++) {
-        temp = temp ^ message[i];  // XOR each character
-        temp += message[i];        // Add each character's value
-    }
+// Function to compute a simple MAC using XOR
+void computeMAC(const char *key, const char *message, char *mac) {
+    int key_len = strlen(key);
+    int msg_len = strlen(message);
     
-    // Store the result in the hash
-    *hash = temp;
+    // XOR the key and message, repeating if necessary
+    for (int i = 0; i < MAC_SIZE; i++) {
+        mac[i] = key[i % key_len] ^ message[i % msg_len]; // Simple XOR operation
+    }
+    mac[MAC_SIZE] = '\0'; // Null-terminate the MAC string
 }
 
 int main() {
-    char message[256];      // Buffer for the input message
-    unsigned char hash;     // Buffer for the hash (only 1 byte for simplicity)
-    char receivedHash[3];   // Buffer for input of received hash (in hex format)
+    char key[100], message[100];
+    char mac[MAC_SIZE + 1]; // Buffer for MAC (+1 for null terminator)
+    char receivedMAC[MAC_SIZE + 1]; // Buffer for input of received MAC
 
-    // Step 1: Input the message
+    // Step 1: Input secret key
+    printf("Enter the secret key: ");
+    scanf("%s", key);
+
+    // Step 2: Input the message
     printf("Enter the message: ");
     scanf("%s", message);
 
-    // Step 2: Compute the simple hash
-    computeSimpleHash(message, &hash);
+    // Step 3: Compute the MAC
+    computeMAC(key, message, mac);
 
-    // Step 3: Display the computed hash in hexadecimal format
-    printf("Computed Hash (in hex): %02x\n", hash);
+    // Step 4: Display the computed MAC in hexadecimal
+    printf("Computed MAC (in hex): ");
+    for (int i = 0; i < MAC_SIZE; i++) {
+        printf("%02x", (unsigned char)mac[i]); // Print each byte as hex
+    }
+    printf("\n");
 
-    // Optional Step 5: Verify the hash
-    printf("Enter the received hash (in hex): ");
-    scanf("%s", receivedHash);
+    // Step 5: Input the received MAC (for verification)
+    printf("Enter the received MAC (as hex): ");
+    for (int i = 0; i < MAC_SIZE; i++) {
+        scanf("%02hhx", &receivedMAC[i]);
+    }
 
-    // Convert received hash from hex string to an unsigned char
-    unsigned int receivedHashValue;
-    sscanf(receivedHash, "%02x", &receivedHashValue);
-
-    // Compare the computed hash with the received hash
-    if (hash == receivedHashValue) {
-        printf("Hash verification successful. Message is unchanged.\n");
+    // Compare the computed MAC with the received MAC
+    if (memcmp(mac, receivedMAC, MAC_SIZE) == 0) {
+        printf("MAC verification successful. Message is authentic.\n");
     } else {
-        printf("Hash verification failed. Message has been altered.\n");
+        printf("MAC verification failed. Message is not authentic.\n");
     }
 
     return 0;
 }
 ```
 ## OUTPUT:
-![image](https://github.com/user-attachments/assets/e1ea7c83-8592-4ddb-b73f-b1c293516fe7)
 
+![image](https://github.com/user-attachments/assets/19018fbe-90b1-4a70-9b40-1a6c617d1ed4)
 
 ## RESULT:
-The program for generating and verifying a simple hash of a given message using a custom hash function was executed successfully. The computed hash ensures basic integrity of the message.
+The program for generating and verifying a Message Authentication Code (MAC) was executed successfully, demonstrating the integrity and authenticity of the message through a simple XOR-based MAC.
