@@ -66,7 +66,7 @@ int main() {
 }
 ```
 ## OUTPUT:
-![image](https://github.com/user-attachments/assets/11e162d7-bca7-41e8-a5d2-352473bfc729)
+![image](https://github.com/user-attachments/assets/e1ea7c83-8592-4ddb-b73f-b1c293516fe7)
 
 
 ## RESULT:
